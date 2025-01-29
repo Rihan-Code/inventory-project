@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import com.example.inventory.repository.InventoryRepository;
 import com.example.inventory.model.Inventory;
+import com.example.inventory.model.ShelfPosition;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import java.util.*;

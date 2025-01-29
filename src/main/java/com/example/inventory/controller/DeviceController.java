@@ -5,7 +5,7 @@ import com.example.inventory.model.Inventory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
-import java.lang.*;;
+import java.lang.*;
 
 @RestController
 @RequestMapping("/api/devices")

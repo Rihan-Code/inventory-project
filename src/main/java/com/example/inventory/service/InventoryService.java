@@ -1,7 +1,8 @@
 package com.example.inventory.service;
 
-import java.util.Optional;
+import java.util.*;
 import com.example.inventory.model.Inventory;
+import com.example.inventory.model.ShelfPosition;
 
 public interface InventoryService {
     Inventory saveDevice(Inventory inventory);
