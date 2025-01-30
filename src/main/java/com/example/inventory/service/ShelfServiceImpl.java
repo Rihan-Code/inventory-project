@@ -5,10 +5,9 @@ import org.springframework.stereotype.Service;
 import com.example.inventory.model.Shelf;
 import com.example.inventory.model.ShelfPosition;
 import com.example.inventory.model.Inventory;
-import com.example.inventory.model.Inventory;
 import com.example.inventory.repository.ShelfRepository;
 import com.example.inventory.repository.ShelfPositionRepository;
-import com.example.inventory.repository.DeviceRepository;
+import com.example.inventory.repository.InventoryRepository;
 
 import java.util.*;
 import java.util.Optional;
@@ -27,7 +26,7 @@ public class ShelfServiceImpl implements ShelfService {
     private ShelfPositionRepository shelfPositionRepository;
 
     @Autowired
-    private DeviceRepository deviceRepository;
+    private InventoryRepository deviceRepository;
 
     @Override
     public Shelf saveShelf(Shelf shelf) {
@@ -82,8 +81,6 @@ public class ShelfServiceImpl implements ShelfService {
 
                 device.getShelfPositions().add(shelfPosition);
 
-                shelfPosition.setDevice(device);
-
                 deviceRepository.save(device);
                 shelfPositionRepository.save(shelfPosition);
             } else {
@@ -91,7 +88,7 @@ public class ShelfServiceImpl implements ShelfService {
             }
         return Optional.empty();
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             logger.error("Error adding shelf position to device", e);
             return Optional.empty();
         }
@@ -103,13 +100,15 @@ public class ShelfServiceImpl implements ShelfService {
 
         try {
             if(shelfOptional.isPresent() && shelfPositionOptional.isPresent()) {
-                Shelf s = shelfOptional.get();
-                s.setShelfPosition(shelfPositionOptional.get());
-                shelfRepository.save(s);
+                ShelfPosition shelfPosition = shelfPositionOptional.get();
+                shelfPosition.setShelf(shelfOptional.get());
+                shelfPositionRepository.save(shelfPosition);
+            } else {
+                throw new RuntimeException("Shelf or ShelfPosition not found.");
             }
             return Optional.empty();
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             logger.error("Error adding shelf to shelf position", e);
             return Optional.empty();
         }

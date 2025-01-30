@@ -14,6 +14,14 @@ public class Inventory {
     private Long id;
     private String name;
     private String deviceType;
+
+    public Inventory(long l, String device1, String type1, List<ShelfPosition> shelfPositions) {
+        this.id = l;
+        this.name = device1;
+        this.deviceType = type1;
+        this.shelfPositions = shelfPositions;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }

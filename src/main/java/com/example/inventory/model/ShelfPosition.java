@@ -12,10 +12,15 @@ public class ShelfPosition {
     private Long id;
     private String name;
 
-    public void setDevice(Inventory device) {
-        this.device = device;
+    public ShelfPosition(long l, String name1) {
+        this.id = l;
+        this.name = name1;
     }
 
-    @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
-    private Inventory device;
+//    public void setDevice(Inventory device) {
+//        this.device = device;
+//    }
+
+    @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
+    private Shelf shelf;
 }
