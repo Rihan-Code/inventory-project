@@ -59,9 +59,11 @@ public class ShelfServiceImplTest {
         when(shelfPositionRepository.findById(1L)).thenReturn(Optional.of(shelfPosition));
 
         shelfService.addShelfToShelfPosition(1L, 1L);
+
         assertNotNull(shelfPosition.getShelf());
         assertEquals(shelf, shelfPosition.getShelf());
 
         verify(shelfPositionRepository, times(1)).save(shelfPosition);
+        verify(shelfRepository, times(1)).save(shelf);
     }
 }

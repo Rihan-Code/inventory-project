@@ -25,6 +25,6 @@ public class Shelf {
 //    }
     // public void deleteShelf(Long id);
 
-//    @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
-//    private ShelfPosition shelfPosition;
+     @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
+     private ShelfPosition shelfPosition;
 }

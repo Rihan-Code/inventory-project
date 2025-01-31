@@ -1,6 +1,7 @@
 package com.example.inventory.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.inventory.model.Shelf;
 import com.example.inventory.model.ShelfPosition;
@@ -67,8 +68,11 @@ public class ShelfServiceImpl implements ShelfService {
 
     @Override
     public Optional<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId) {
-        Optional<Inventory> deviceOptional = deviceRepository.findById(deviceId);
-        Optional<ShelfPosition> shelfPositionOptional = shelfPositionRepository.findById(shelfPositionId);
+        Optional<Inventory> deviceOptional = Optional.ofNullable(deviceRepository.findById(deviceId)
+                .orElseThrow(() -> new RuntimeException("Device not found with id " + deviceId)));
+
+        Optional<ShelfPosition> shelfPositionOptional = Optional.ofNullable(shelfPositionRepository.findById(shelfPositionId))
+                .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
         try {
             if(deviceOptional.isPresent() && shelfPositionOptional.isPresent()) {
@@ -88,30 +92,36 @@ public class ShelfServiceImpl implements ShelfService {
             }
         return Optional.empty();
         } catch (Exception e) {
-//            e.printStackTrace();
             logger.error("Error adding shelf position to device", e);
             return Optional.empty();
         }
     }
 
     public Optional<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId) {
-        Optional<Shelf> shelfOptional = shelfRepository.findById(shelfId);
-        Optional<ShelfPosition> shelfPositionOptional = shelfPositionRepository.findById(shelfPositionId);
+        Shelf shelf = shelfRepository.findById(shelfId)
+                .orElseThrow(() -> new RuntimeException("Shelf not found with id " + shelfId));
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
         try {
-            if(shelfOptional.isPresent() && shelfPositionOptional.isPresent()) {
-                ShelfPosition shelfPosition = shelfPositionOptional.get();
-                shelfPosition.setShelf(shelfOptional.get());
-                shelfPositionRepository.save(shelfPosition);
-            } else {
-                throw new RuntimeException("Shelf or ShelfPosition not found.");
+            // Validating if the one-to-one relationship is already established
+            if (shelfPosition.getShelf() != null) {
+                throw new RuntimeException("This shelf position already has a shelf assigned.");
             }
+            if (shelf.getShelfPosition() != null) {
+                throw new RuntimeException("This shelf is already assigned to a shelf position.");
+            }
+
+            shelfPosition.setShelf(shelf);
+            shelf.setShelfPosition(shelfPosition);
+
+            shelfPositionRepository.save(shelfPosition);
+            shelfRepository.save(shelf);
+
             return Optional.empty();
         } catch (Exception e) {
-//            e.printStackTrace();
-            logger.error("Error adding shelf to shelf position", e);
-            return Optional.empty();
+            logger.error("Error occurred while saving shelfPosition with shelf.", e.getCause());
+            throw new RuntimeException("Failed to save Shelf to ShelfPosition", e);
         }
     }
-    
 }
