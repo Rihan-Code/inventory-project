@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
@@ -17,6 +18,7 @@ import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 public class ShelfControllerTest {
 
     @InjectMocks
@@ -72,7 +74,7 @@ public class ShelfControllerTest {
 
     @Test
     void testAddShelfPositionToDevice() {
-        Inventory device = new Inventory(1L, "Device1", "Type1", new ArrayList<>());
+        Inventory device = new Inventory(1L, "Device1", "Type1", null);
         ShelfPosition shelfPosition = new ShelfPosition(1L, "Position1");
 
         shelfController.addShelfPositionToDevice(1L, 1L);

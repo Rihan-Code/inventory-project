@@ -2,6 +2,8 @@ package com.example.inventory.service;
 
 import com.example.inventory.model.Shelf;
 import com.example.inventory.model.ShelfPosition;
+import org.springframework.http.ResponseEntity;
+
 import java.util.*;
 
 public interface ShelfService {
@@ -14,6 +16,6 @@ public interface ShelfService {
     Optional<ShelfPosition> getShelfPosition(Long id);
     Optional<List<ShelfPosition>> getAllShelfPositions();
 
-    Optional<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId);
-    Optional<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId);
+    ResponseEntity<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId);
+    ResponseEntity<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId);
 }

@@ -1,5 +1,7 @@
 package com.example.inventory.service;
 
+import org.springframework.http.HttpStatus;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -66,62 +68,84 @@ public class ShelfServiceImpl implements ShelfService {
         return shelfPositions.isEmpty() ? Optional.empty() : Optional.of(shelfPositions);
     }
 
+    @Transactional
     @Override
-    public Optional<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId) {
-        Optional<Inventory> deviceOptional = Optional.ofNullable(deviceRepository.findById(deviceId)
-                .orElseThrow(() -> new RuntimeException("Device not found with id " + deviceId)));
-
-        Optional<ShelfPosition> shelfPositionOptional = Optional.ofNullable(shelfPositionRepository.findById(shelfPositionId))
-                .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
-
+    public ResponseEntity<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId) {
+        if (deviceId == null || shelfPositionId == null) {
+            throw new IllegalArgumentException("Device id and Shelf Position id must not be null.");
+        }
         try {
-            if(deviceOptional.isPresent() && shelfPositionOptional.isPresent()) {
-                Inventory device = deviceOptional.get();
-                ShelfPosition shelfPosition = shelfPositionOptional.get();
+            Inventory device = deviceRepository.findById(deviceId)
+                    .orElseThrow(() -> new RuntimeException("Device not found with id " + deviceId));
+            ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                    .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
-                if(device.getShelfPositions() == null) {
-                    device.setShelfPositions(new ArrayList<>());
-                }
-
-                device.getShelfPositions().add(shelfPosition);
-
-                deviceRepository.save(device);
-                shelfPositionRepository.save(shelfPosition);
-            } else {
-                throw new RuntimeException("Device or ShelfPosition not found.");
+            // checking if the shelf position already has a device assigned
+            if (shelfPosition.getDevice() != null) {
+                throw new RuntimeException("This shelf position already has a device assigned.");
             }
-        return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Error adding shelf position to device", e);
-            return Optional.empty();
+
+            // Initializing the list of shelf positions if null
+            if (device.getShelfPositions() == null) {
+                device.setShelfPositions(new ArrayList<>());
+            }
+
+            // saving shelf position id to the device arraylist
+            device.getShelfPositions().add(shelfPositionId);
+
+            // saving the device instance to shelfposition
+            shelfPosition.setDevice(device);
+
+            // repository intaraction
+            deviceRepository.save(device);
+            shelfPositionRepository.save(shelfPosition);
+
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            logger.error("Relationship validation failed while associating device id {} with shelf positoion id {}: {}", deviceId, shelfPositionId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error occurred while associating device id {} with shelf position id {}: {}", deviceId, shelfPositionId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
-    public Optional<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId) {
+    @Transactional
+    @Override
+    public ResponseEntity<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId) {
+        if (shelfId == null || shelfPositionId == null) {
+            throw new IllegalArgumentException("Shelf ID and Shelf Position ID must not be null.");
+        }
         Shelf shelf = shelfRepository.findById(shelfId)
                 .orElseThrow(() -> new RuntimeException("Shelf not found with id " + shelfId));
         ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
                 .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
         try {
-            // Validating if the one-to-one relationship is already established
             if (shelfPosition.getShelf() != null) {
-                throw new RuntimeException("This shelf position already has a shelf assigned.");
+                throw new IllegalStateException("This shelf position already has a shelf assigned.");
             }
             if (shelf.getShelfPosition() != null) {
-                throw new RuntimeException("This shelf is already assigned to a shelf position.");
+                throw new IllegalStateException("This shelf is already assigned to a shelf position.");
             }
 
+            // saving the shelf instance to shelf position
             shelfPosition.setShelf(shelf);
+
+            // saving the shelf position instance to shelf
             shelf.setShelfPosition(shelfPosition);
 
+            // repository interaction
             shelfPositionRepository.save(shelfPosition);
             shelfRepository.save(shelf);
 
-            return Optional.empty();
-        } catch (Exception e) {
-            logger.error("Error occurred while saving shelfPosition with shelf.", e.getCause());
-            throw new RuntimeException("Failed to save Shelf to ShelfPosition", e);
+            return ResponseEntity.ok().build();
+        } catch (IllegalStateException e) {
+            logger.error("Relationship validation failed while associating shelf id {} with shelf position id {}: {}", shelfId, shelfPositionId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+        } catch (RuntimeException e) {
+            logger.error("Unexpected error occurred while associating shelf id {} with shelf psoition id {}: {}", shelfId, shelfPositionId, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 }

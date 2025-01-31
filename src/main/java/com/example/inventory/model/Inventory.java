@@ -14,26 +14,20 @@ public class Inventory {
     private Long id;
     private String name;
     private String deviceType;
+    private List<Long> shelfPositions = new ArrayList<>();
 
-    public Inventory(long l, String device1, String type1, List<ShelfPosition> shelfPositions) {
+
+    public Inventory(long l, String device1, String type1, Long shelfPositionId) {
         this.id = l;
         this.name = device1;
         this.deviceType = type1;
-        this.shelfPositions = shelfPositions;
+        this.shelfPositions.add(shelfPositionId);
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+//    public void setId(Long id) {
+//        this.id = id;
+//    }
 
     @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
-    private List<ShelfPosition> shelfPositions = new ArrayList<>();
-
-    public List<ShelfPosition> getShelfPositions() {
-        return shelfPositions;
-    }
-
-    public void setShelfPositions(List<ShelfPosition> shelfPositions) {
-        this.shelfPositions = shelfPositions;
-    }
+    private ShelfPosition shelfPosition;
 }

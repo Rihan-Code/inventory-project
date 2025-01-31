@@ -17,9 +17,8 @@ public class ShelfPosition {
         this.name = name1;
     }
 
-//    public void setDevice(Inventory device) {
-//        this.device = device;
-//    }
+    @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
+    private Inventory device;
 
     @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
     private Shelf shelf;

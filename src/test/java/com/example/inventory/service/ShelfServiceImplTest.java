@@ -11,10 +11,13 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
+
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@SpringBootTest
 public class ShelfServiceImplTest {
     @Mock // creates a mock instance of a class
     private InventoryRepository deviceRepository;
@@ -34,9 +37,9 @@ public class ShelfServiceImplTest {
 
     @BeforeEach
     public void setUp() {
-        device = new Inventory(1L, "Device1", "Type1", new ArrayList<>());
+        device = new Inventory(1L, "Device1", "Type1", 1L);
         shelf = new Shelf(1L, "Shelf1", "Wooden");
-        shelfPosition = new ShelfPosition(1L, "Position1", null);
+        shelfPosition = new ShelfPosition(1L, "Position1");
         MockitoAnnotations.openMocks(this);
     }
 
@@ -47,7 +50,7 @@ public class ShelfServiceImplTest {
 
         shelfService.addShelfPositionToDevice(1L, 1L);
         assertNotNull(device.getShelfPositions());
-        assertTrue(device.getShelfPositions().contains(shelfPosition));
+        assertTrue(device.getShelfPositions().contains(1L));
 
         verify(deviceRepository, times(1)).save(device);
         verify(shelfPositionRepository, times(1)).save(shelfPosition);

@@ -19,11 +19,9 @@ public class Shelf {
         this.shelfType = type1;
     }
 
-    // public void setShelfPosition(ShelfPosition shelfPosition);
 //    public void setShelfPosition(ShelfPosition shelfPosition) {
 //        this.shelfPosition = shelfPosition;
 //    }
-    // public void deleteShelf(Long id);
 
      @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
      private ShelfPosition shelfPosition;
