@@ -96,7 +96,7 @@ public class ShelfServiceImpl implements ShelfService {
             // saving the device instance to shelfposition
             shelfPosition.setDevice(device);
 
-            // repository intaraction
+            // repository interaction
             deviceRepository.save(device);
             shelfPositionRepository.save(shelfPosition);
 
@@ -116,12 +116,14 @@ public class ShelfServiceImpl implements ShelfService {
         if (shelfId == null || shelfPositionId == null) {
             throw new IllegalArgumentException("Shelf ID and Shelf Position ID must not be null.");
         }
-        Shelf shelf = shelfRepository.findById(shelfId)
-                .orElseThrow(() -> new RuntimeException("Shelf not found with id " + shelfId));
-        ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
-                .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
         try {
+            Shelf shelf = shelfRepository.findById(shelfId)
+                    .orElseThrow(() -> new RuntimeException("Shelf not found with id " + shelfId));
+            ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
+                    .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
+
+
             if (shelfPosition.getShelf() != null) {
                 throw new IllegalStateException("This shelf position already has a shelf assigned.");
             }
