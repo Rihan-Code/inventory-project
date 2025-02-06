@@ -1,6 +1,6 @@
 package com.example.inventory.controller;
 
-import com.example.inventory.model.Inventory;
+import com.example.inventory.model.Device;
 import com.example.inventory.model.Shelf;
 import com.example.inventory.service.ShelfService;
 import com.example.inventory.model.ShelfPosition;
@@ -9,7 +9,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.ResponseEntity;
 
 import java.util.*;
@@ -26,14 +25,15 @@ public class ShelfControllerTest {
     @Mock
     private ShelfService shelfService;
 
+    private Shelf shelf;
     @BeforeEach
     void setUp() {
+        Shelf shelf = new Shelf(1L, "Shelf1", "Wooden", "Live", null);
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
     void testSaveShelf() {
-        Shelf shelf = new Shelf(1L, "Shelf1", "Wooden");
         when(shelfService.saveShelf(shelf)).thenReturn(shelf);
 
         ResponseEntity<Shelf> response = shelfController.saveShelf(shelf);
@@ -44,8 +44,7 @@ public class ShelfControllerTest {
 
     @Test
     void testGetShelfById() {
-        Shelf shelf = new Shelf(1L, "Shelf1", "Wooden");
-        when(shelfService.getShelf(1L)).thenReturn(Optional.of(shelf));
+        when(shelfService.getShelf(1L)).thenReturn(Optional.ofNullable(shelf));
 
         ResponseEntity<Shelf> response = shelfController.getShelf(1L);
         assertNotNull(response);
@@ -55,8 +54,8 @@ public class ShelfControllerTest {
     @Test
     void testGetAllShelves() {
         List<Shelf> shelves = Arrays.asList(
-                new Shelf(1L, "Shelf1", "Wooden"),
-                new Shelf(2L, "Shelf2", "Metal")
+                new Shelf(1L, "Shelf1", "Wooden", "Live"),
+                new Shelf(2L, "Shelf2", "Metal", "Live")
         );
         when(shelfService.getAllShelves()).thenReturn(Optional.of(shelves));
 
@@ -73,8 +72,8 @@ public class ShelfControllerTest {
 
     @Test
     void testAddShelfPositionToDevice() {
-        Inventory device = new Inventory(1L, "Device1", "Type1", null);
-        ShelfPosition shelfPosition = new ShelfPosition(1L, "Position1");
+        Device device = new Device(1L, "Device1", "Type1", "Live", new HashSet<>());
+        ShelfPosition shelfPosition = new ShelfPosition(1L, "Position1", "Live");
 
         shelfController.addShelfPositionToDevice(1L, 1L);
         verify(shelfService, times(1)).addShelfPositionToDevice(1L, 1L);
@@ -82,8 +81,7 @@ public class ShelfControllerTest {
 
     @Test
     void testAddShelfToShelfPosition() {
-        Shelf shelf = new Shelf(1L, "Shelf1", "Wooden");
-        ShelfPosition shelfPosition = new ShelfPosition(1L, "Position1");
+        ShelfPosition shelfPosition = new ShelfPosition(1L, "Position1", "Live");
 
         shelfController.addShelfToShelfPosition(1L, 1L);
         verify(shelfService, times(1)).addShelfToShelfPosition(1L, 1L);

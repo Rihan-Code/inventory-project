@@ -7,12 +7,12 @@
 <img width="950" alt="Inventory Nodes 1 png " src="https://github.com/user-attachments/assets/b43e7aaa-3ae1-47c6-bbf8-e4382d0b1368" />
 
 
-A **Spring Boot** project with **Neo4j** integration for managging inventory items efficiently.
+A **Spring Boot** project with **Neo4j** integration for managging device items efficiently.
 
 ## 1. *Clone the repository*
 ```
-git clone https://github.com/Rihan-Code/inventory-project.git
-cd inventory-project
+git clone https://github.com/Rihan-Code/device-project.git
+cd device-project
 ```
 ## 2. *Set up Neo4j DB*
 

@@ -1,44 +1,52 @@
 package com.example.inventory.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import com.example.inventory.model.Device;
+import com.example.inventory.repository.DeviceRepository;
+import lombok.extern.slf4j.Slf4j;
 
-import com.example.inventory.repository.InventoryRepository;
-import com.example.inventory.model.Inventory;
-import com.example.inventory.model.ShelfPosition;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
 @Service
+@Slf4j 
 public class DeviceService implements InventoryService {
-    @Autowired
-    private InventoryRepository inventoryRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(DeviceService.class);
-
-    @Override
-    public Inventory saveDevice(Inventory inventory) {
-        logger.info("Saving device: {}", inventory);
-        return inventoryRepository.save(inventory);
+//    @Autowired
+//    private InventoryRepository inventoryRepository;
+    private final DeviceRepository deviceRepository;
+    DeviceService(DeviceRepository deviceRepository) {
+        this.deviceRepository = deviceRepository;
     }
 
     @Override
-    public Optional<Inventory> getDevice(Long id) {
-        logger.info("Fetching device with ID: {}", id);
-        return inventoryRepository.findById(id);
+    public Optional<Device> saveDevice(Device device){
+        log.info("Saving device: {}", device);
+        return Optional.of(deviceRepository.save(device));
     }
 
     @Override
-    public void deleteDevice(Long id) {
-        logger.info("Deleting device with ID: {}", id);
-        inventoryRepository.deleteById(id);
+    public Optional<Device> getDevice(Long id) {
+        return Optional.ofNullable(deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found!")));
     }
 
     @Override
-    public Inventory modifyDevice(Long id, Inventory updatedInventory) {
-        logger.info("Modifying device with ID: {}", id);
-        updatedInventory.setId(id);
-        return inventoryRepository.save(updatedInventory);
+    public Optional<Object> deleteDevice(Long id) {
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found!"));
+        device.setStatus("Decommissioned");
+        deviceRepository.save(device);
+        return Optional.empty();
+    }
+
+    @Override
+    public Device modifyDevice(Long id, Device updatedDevice) {
+        Device device = deviceRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Device not found!"));
+        device.setName(updatedDevice.getName());
+        device.setDeviceType(updatedDevice.getDeviceType());
+        device.setStatus(updatedDevice.getStatus());
+        deviceRepository.save(device);
+        return device;
     }
 }

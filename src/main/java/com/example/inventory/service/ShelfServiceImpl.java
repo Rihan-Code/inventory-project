@@ -1,35 +1,34 @@
 package com.example.inventory.service;
 
+import com.example.inventory.model.Device;
+import com.example.inventory.repository.DeviceRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import com.example.inventory.model.Shelf;
 import com.example.inventory.model.ShelfPosition;
-import com.example.inventory.model.Inventory;
 import com.example.inventory.repository.ShelfRepository;
 import com.example.inventory.repository.ShelfPositionRepository;
-import com.example.inventory.repository.InventoryRepository;
 
 import java.util.*;
 import java.util.Optional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
+@Slf4j
 public class ShelfServiceImpl implements ShelfService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ShelfServiceImpl.class);
+    private final DeviceRepository deviceRepository;
+    private final ShelfPositionRepository shelfPositionRepository;
+    private final ShelfRepository shelfRepository;
 
-    @Autowired
-    private ShelfRepository shelfRepository;
-
-    @Autowired
-    private ShelfPositionRepository shelfPositionRepository;
-
-    @Autowired
-    private InventoryRepository deviceRepository;
+    // dependency injections
+    ShelfServiceImpl(DeviceRepository deviceRepository, ShelfPositionRepository shelfPositionRepository, ShelfRepository shelfRepository) {
+        this.shelfPositionRepository = shelfPositionRepository;
+        this.deviceRepository = deviceRepository;
+        this.shelfRepository = shelfRepository;
+    }
 
     @Override
     public Shelf saveShelf(Shelf shelf) {
@@ -38,7 +37,7 @@ public class ShelfServiceImpl implements ShelfService {
 
     @Override 
     public void deleteShelf(Long id) {
-        shelfRepository.deleteById(id);
+
     }
 
     @Override
@@ -72,48 +71,56 @@ public class ShelfServiceImpl implements ShelfService {
     @Override
     public ResponseEntity<Void> addShelfPositionToDevice(Long deviceId, Long shelfPositionId) {
         if (deviceId == null || shelfPositionId == null) {
+            log.error("Device id and Shelf Position id must not be null.");
             throw new IllegalArgumentException("Device id and Shelf Position id must not be null.");
         }
         try {
-            Inventory device = deviceRepository.findById(deviceId)
+            // Fetch the device and shelf position from repositories
+            Device device = deviceRepository.findById(deviceId)
                     .orElseThrow(() -> new RuntimeException("Device not found with id " + deviceId));
             ShelfPosition shelfPosition = shelfPositionRepository.findById(shelfPositionId)
                     .orElseThrow(() -> new RuntimeException("ShelfPosition not found with id " + shelfPositionId));
 
-            // checking if the shelf position already has a device assigned
+            // Check if the shelf position is already assigned to a device
             if (shelfPosition.getDevice() != null) {
+                log.error("This shelf position is already assigned to a device.");
                 throw new RuntimeException("This shelf position already has a device assigned.");
             }
 
-            // Initializing the list of shelf positions if null
+            // Initialize the set of shelf positions if it's null
             if (device.getShelfPositions() == null) {
-                device.setShelfPositions(new ArrayList<>());
+                device.setShelfPositions(new HashSet<>());
             }
 
-            // saving shelf position id to the device arraylist
-            device.getShelfPositions().add(shelfPositionId);
-
-            // saving the device instance to shelfposition
+            // Add the shelf position to the device and set the bidirectional relationship
+            device.getShelfPositions().add(shelfPosition);
             shelfPosition.setDevice(device);
-
-            // repository interaction
+            // Save the updated entities
             deviceRepository.save(device);
             shelfPositionRepository.save(shelfPosition);
 
+            log.info("Device with id {} is associated with ShelfPosition id {}", deviceId, shelfPositionId);
+
+            // Return a successful response
             return ResponseEntity.ok().build();
+
         } catch (IllegalStateException e) {
-            logger.error("Relationship validation failed while associating device id {} with shelf positoion id {}: {}", deviceId, shelfPositionId, e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
+            log.error("Failed relationship validation while associating device id {} with shelf position id {}: {}",
+                    deviceId, shelfPositionId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+
         } catch (RuntimeException e) {
-            logger.error("Unexpected error occurred while associating device id {} with shelf position id {}: {}", deviceId, shelfPositionId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            log.error("Unexpected error occurred while associating device id {} with shelf position id {}: {}",
+                    deviceId, shelfPositionId, e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
 
-    @Transactional
+@Transactional
     @Override
     public ResponseEntity<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId) {
         if (shelfId == null || shelfPositionId == null) {
+            log.error("Shelf ID and Shelf Position ID must not be null.");
             throw new IllegalArgumentException("Shelf ID and Shelf Position ID must not be null.");
         }
 
@@ -125,9 +132,11 @@ public class ShelfServiceImpl implements ShelfService {
 
 
             if (shelfPosition.getShelf() != null) {
+                log.error("This shelf position already has a shelf assigned.");
                 throw new IllegalStateException("This shelf position already has a shelf assigned.");
             }
             if (shelf.getShelfPosition() != null) {
+                log.error("This shelf is already assigned to a shelf position.");
                 throw new IllegalStateException("This shelf is already assigned to a shelf position.");
             }
 
@@ -141,12 +150,14 @@ public class ShelfServiceImpl implements ShelfService {
             shelfPositionRepository.save(shelfPosition);
             shelfRepository.save(shelf);
 
+            log.info("The shelf with id: {} is associated with shelf position id: {}", shelfId, shelfPositionId);
+
             return ResponseEntity.ok().build();
         } catch (IllegalStateException e) {
-            logger.error("Relationship validation failed while associating shelf id {} with shelf position id {}: {}", shelfId, shelfPositionId, e.getMessage());
+            log.error("Relationship validation failed while associating shelf id {} with shelf position id {}: {}", shelfId, shelfPositionId, e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(null);
         } catch (RuntimeException e) {
-            logger.error("Unexpected error occurred while associating shelf id {} with shelf psoition id {}: {}", shelfId, shelfPositionId, e);
+            log.error("Unexpected error occurred while associating shelf id {} with shelf position id {}: {}", shelfId, shelfPositionId, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }

@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>inventory</artifactId>
+	<artifactId>device</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>inventory</name>
-	<description>This project includes the CRUD operations related to an inventory of devices.</description>
+	<name>device</name>
+	<description>This project includes the CRUD operations related to an device of devices.</description>
 	<url/>
 	<licenses>
 		<license/>

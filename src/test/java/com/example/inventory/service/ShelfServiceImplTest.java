@@ -1,9 +1,9 @@
 package com.example.inventory.service;
 
-import com.example.inventory.model.Inventory;
+import com.example.inventory.model.Device;
 import com.example.inventory.model.Shelf;
 import com.example.inventory.model.ShelfPosition;
-import com.example.inventory.repository.InventoryRepository;
+import com.example.inventory.repository.DeviceRepository;
 import com.example.inventory.repository.ShelfPositionRepository;
 import com.example.inventory.repository.ShelfRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -20,7 +19,7 @@ import static org.mockito.Mockito.*;
 
 public class ShelfServiceImplTest {
     @Mock // creates a mock instance of a class
-    private InventoryRepository deviceRepository;
+    private DeviceRepository deviceRepository;
 
     @Mock
     private ShelfRepository shelfRepository;
@@ -31,15 +30,15 @@ public class ShelfServiceImplTest {
     @InjectMocks // injects mock dependencies into the test object
     private ShelfServiceImpl shelfService;
 
-    private Inventory device;
+    private Device device;
     private Shelf shelf;
     private ShelfPosition shelfPosition;
 
     @BeforeEach
     public void setUp() {
-        device = new Inventory(1L, "Device1", "Type1", 1L);
-        shelf = new Shelf(1L, "Shelf1", "Wooden");
-        shelfPosition = new ShelfPosition(1L, "Position1");
+        device = new Device(1L, "Device1", "Type1", "Live", new HashSet<>());
+        shelf = new Shelf(1L, "Shelf1", "Wooden", "Live");
+        shelfPosition = new ShelfPosition(1L, "Position1", "Live");
         MockitoAnnotations.openMocks(this);
     }
 
@@ -50,7 +49,7 @@ public class ShelfServiceImplTest {
 
         shelfService.addShelfPositionToDevice(1L, 1L);
         assertNotNull(device.getShelfPositions());
-        assertTrue(device.getShelfPositions().contains(1L));
+        assertTrue(device.getShelfPositions().contains(shelfPosition));
 
         verify(deviceRepository, times(1)).save(device);
         verify(shelfPositionRepository, times(1)).save(shelfPosition);

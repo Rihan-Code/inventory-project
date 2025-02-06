@@ -1,13 +1,15 @@
 package com.example.inventory.service;
 
 import java.util.*;
-import com.example.inventory.model.Inventory;
-import com.example.inventory.model.ShelfPosition;
+
+import com.example.inventory.model.Device;
 
 public interface InventoryService {
-    Inventory saveDevice(Inventory inventory);
-    Optional<Inventory> getDevice(Long id);
+    Optional<Device> saveDevice(Device device);
+    Optional<Device> getDevice(Long id);
 
-    void deleteDevice(Long id);
-    Inventory modifyDevice(Long id, Inventory updatedInventory);
+    Optional<Object> deleteDevice(Long id);
+    Device modifyDevice(Long id, Device updatedDevice);
+
+
 }

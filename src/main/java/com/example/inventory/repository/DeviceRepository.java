@@ -1,10 +1,10 @@
 package com.example.inventory.repository;
 
-import com.example.inventory.model.Inventory;
+import com.example.inventory.model.Device;
 import org.springframework.data.neo4j.repository.Neo4jRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface InventoryRepository extends Neo4jRepository<Inventory, Long> {
+public interface DeviceRepository extends Neo4jRepository<Device, Long> {
     // automatically provides methods like save, findById, deleteById, etc.
 } 

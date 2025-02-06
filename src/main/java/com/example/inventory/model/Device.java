@@ -1,38 +1,37 @@
 package com.example.inventory.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.*;
+
+import java.util.HashSet;
+import java.util.Set;
 
 @Node
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true) // Avoid cyclic recursion in equals/hashCode.
-public class ShelfPosition {
+public class Device {
     @Id
     @GeneratedValue
-    @EqualsAndHashCode.Include // Use only the ID for equality and hashing.
+    @EqualsAndHashCode.Include
     private Long id;
 
     private String name;
+    private String deviceType;
     private String status = "Live";
 
-
-    @JsonBackReference // Handle serialization for bidirectional reference
-    @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
-    @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
-    private Device device;
-
-    @JsonBackReference // Handle serialization for bidirectional reference
+    @JsonManagedReference // Handle serialization for bidirectional reference
     @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
     @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
-    private Shelf shelf;
+    private Set<ShelfPosition> shelfPositions = new HashSet<>();
 
     // Custom Constructor
-    public ShelfPosition(Long id, String name, String status) {
+    public Device(Long id, String name, String deviceType, String status) {
         this.id = id;
         this.name = name;
+        this.deviceType = deviceType;
         this.status = status.equalsIgnoreCase("Decommissioned") ? "Decommissioned" : "Live";
     }
 }

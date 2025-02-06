@@ -42,7 +42,7 @@ public class ShelfController {
     // deleting a shelf using it's id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShelf(@PathVariable Long id) {
-        shelfService.deleteShelf(id);
+        shelfService.deleteShelf(id); // do not hard delete
         return ResponseEntity.noContent().build();
     }
 
