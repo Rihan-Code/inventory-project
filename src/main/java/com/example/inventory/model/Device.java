@@ -18,6 +18,8 @@ public class Device {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Property("deviceId")
+    private Long deviceId;
     private String name;
     private String deviceType;
     private String status = "Live";
@@ -27,11 +29,12 @@ public class Device {
     @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
     private Set<ShelfPosition> shelfPositions = new HashSet<>();
 
-    // Custom Constructor
-    public Device(Long id, String name, String deviceType, String status) {
-        this.id = id;
+
+    public Device(Long deviceId, String name, String deviceType, String status, Set<ShelfPosition> shelfPositions) {
+        this.deviceId = deviceId;
         this.name = name;
         this.deviceType = deviceType;
         this.status = status.equalsIgnoreCase("Decommissioned") ? "Decommissioned" : "Live";
+        this.shelfPositions = shelfPositions;
     }
 }

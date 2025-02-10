@@ -24,7 +24,7 @@ public class DeviceControllerTest {
 
     @BeforeEach
     public void setUp() {
-        device = new Device(1L, "Device1", "Type1", "Live", new HashSet<>());
+        device = new Device(1L, "Device1", "Typ1", "Live", new HashSet<>());
         MockitoAnnotations.openMocks(this);
     }
 
