@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.http.ResponseEntity;
 import java.lang.*;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -29,6 +30,11 @@ public class DeviceController {
         return deviceService.getDevice(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Device>> getAllDevices() {
+        return ResponseEntity.ok(deviceService.getAllDevices());
     }
 
     @PutMapping("/{id}")

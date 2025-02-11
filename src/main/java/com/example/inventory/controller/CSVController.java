@@ -55,13 +55,13 @@ public class CSVController {
     public ResponseEntity<String> importDevices(@RequestParam("file") MultipartFile file) {
         if(file.isEmpty()) return ResponseEntity.badRequest().body("No file upload!");
 
-        try{
-            File csvFile = new File("uploaded_devices.csv");
-            file.transferTo(csvFile);
-            csvImportService.importDevicesFromCSV(csvFile.getAbsolutePath());
+//        try{
+//             File csvFile = new File("uploaded_devices.csv");
+//            file.transferTo(csvFile);
+            csvImportService.importDevicesFromCSV(file);
             return ResponseEntity.ok("Devices Imported successfully!");
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().body(e.getMessage());
-        }
+//        } catch (IOException e) {
+//            return ResponseEntity.internalServerError().body(e.getMessage());
+//        }
     }
 }

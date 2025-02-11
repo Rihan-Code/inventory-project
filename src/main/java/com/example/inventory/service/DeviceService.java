@@ -4,7 +4,6 @@ import com.example.inventory.model.Device;
 import com.example.inventory.repository.DeviceRepository;
 import lombok.extern.slf4j.Slf4j;
 
-import org.springframework.data.neo4j.repository.query.Query;
 import org.springframework.stereotype.Service;
 import java.util.*;
 
@@ -28,6 +27,11 @@ public class DeviceService implements InventoryService {
     public Optional<Device> getDevice(Long id) {
         return Optional.ofNullable(deviceRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Device not found!")));
+    }
+
+    public List<Device> getAllDevices() {
+        return Optional.of(deviceRepository.findAll())
+                .orElseThrow(() -> new RuntimeException("Devices not found!"));
     }
 
     @Override

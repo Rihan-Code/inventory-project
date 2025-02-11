@@ -46,7 +46,7 @@ public class CSVExportService {
 
         Long lastDeviceId = findLastDeviceId(fileName);
 
-        try(FileWriter writer = new FileWriter(fileName, true)) {
+        try(FileWriter writer = new FileWriter(fileName, false)) {
             for(Device device : newDevices) {
                 device.setDeviceId(++lastDeviceId);
 
@@ -78,9 +78,11 @@ public class CSVExportService {
                 String[] columns = lastLine.split(",");
                 lastDeviceId = Long.parseLong(columns[0]);
             }
+            log.info("Last device id is {}", lastDeviceId);
+            return lastDeviceId;
         } catch (IOException e) {
-            log.warn("Could not determine the last deviceId, starting from 101");
+            log.error("Could not determine the last deviceId, starting from 101");
         }
-        return lastDeviceId;
+        return null;
     }
 }

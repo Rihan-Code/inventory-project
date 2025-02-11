@@ -19,7 +19,7 @@ public class ShelfPosition {
     private String status = "Live";
 
 
-    @JsonBackReference // Handle serialization for bidirectional reference
+    @JsonBackReference // Handle serialization for bidirectional reference, prevents infinite recursion
     @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
     @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
     private Device device;

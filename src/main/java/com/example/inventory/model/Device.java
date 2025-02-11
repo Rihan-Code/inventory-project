@@ -1,5 +1,6 @@
 package com.example.inventory.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.*;
 import org.springframework.data.neo4j.core.schema.*;
@@ -24,7 +25,8 @@ public class Device {
     private String deviceType;
     private String status = "Live";
 
-    @JsonManagedReference // Handle serialization for bidirectional reference
+    @JsonIgnore // prevents serialization issues, otherwise a circular references or serialization issues when converting *JASON to Java objects using Jackson in Spring Boot*
+    @JsonManagedReference // Handle serialization for bidirectional reference, marks the forward relationship
     @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
     @Relationship(type = "HAS", direction = Relationship.Direction.OUTGOING)
     private Set<ShelfPosition> shelfPositions = new HashSet<>();
