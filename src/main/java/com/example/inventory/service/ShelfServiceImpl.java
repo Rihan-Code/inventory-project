@@ -1,6 +1,7 @@
 package com.example.inventory.service;
 
 import com.example.inventory.model.Device;
+import com.example.inventory.model.ShelfSummaryDTO;
 import com.example.inventory.repository.DeviceRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,13 +32,8 @@ public class ShelfServiceImpl implements ShelfService {
     }
 
     @Override
-    public Shelf saveShelf(Shelf shelf) {
-        return shelfRepository.save(shelf);
-    }
-
-    @Override 
-    public void deleteShelf(Long id) {
-
+    public Optional<Shelf> saveShelf(Shelf shelf) {
+        return Optional.of(shelfRepository.save(shelf));
     }
 
     @Override
@@ -52,8 +48,35 @@ public class ShelfServiceImpl implements ShelfService {
     }
 
     @Override
-    public ShelfPosition saveShelfPosition(ShelfPosition shelfPosition) {
-        return shelfPositionRepository.save(shelfPosition);
+    public Optional<Shelf> updateShelf(Long id, Shelf updatedShelf) {
+        Shelf shelf = shelfRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Shelf not found!"));
+        shelf.setName(updatedShelf.getName());
+        shelf.setShelfType(updatedShelf.getShelfType());
+        shelf.setStatus(updatedShelf.getStatus());
+        shelfRepository.save(shelf);
+        return Optional.of(shelf);
+    }
+
+    @Override 
+    public Optional<String> deleteShelf(Long id) {
+        Shelf shelf = shelfRepository.findById(id)
+                        .orElseThrow(() -> new RuntimeException("Shelf not found"));
+        shelf.setStatus("Decommissioned");
+        shelfRepository.save(shelf);
+        return Optional.of("Shelf soft deleted");
+    }
+
+    @Override
+    public Optional<ShelfSummaryDTO> getShelfSummaryById(Long id) {
+        return shelfRepository.shelfSummary(id);
+    }
+
+
+    // **Shelf Position Requests**
+    @Override
+    public Optional<ShelfPosition> saveShelfPosition(ShelfPosition shelfPosition) {
+        return Optional.of(shelfPositionRepository.save(shelfPosition));
     }
 
     @Override
@@ -65,6 +88,25 @@ public class ShelfServiceImpl implements ShelfService {
     public Optional<List<ShelfPosition>> getAllShelfPositions() {
         List<ShelfPosition> shelfPositions = shelfPositionRepository.findAll();
         return shelfPositions.isEmpty() ? Optional.empty() : Optional.of(shelfPositions);
+    }
+
+    @Override
+    public Optional<ShelfPosition> updateShelfPosition(Long id, ShelfPosition updatedShelfPosition) {
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Shelf Position not found!"));
+        shelfPosition.setName(updatedShelfPosition.getName());
+        shelfPosition.setStatus(updatedShelfPosition.getStatus());
+        shelfPositionRepository.save(shelfPosition);
+        return Optional.of(shelfPosition);
+    }
+
+    @Override
+    public Optional<String> deleteShelfPosition(Long id) {
+        ShelfPosition shelfPosition = shelfPositionRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Shelf Position not found"));
+        shelfPosition.setStatus("Decommissioned");
+        shelfPositionRepository.save(shelfPosition);
+        return Optional.of("Shelf Position soft deleted");
     }
 
     @Transactional
@@ -116,7 +158,7 @@ public class ShelfServiceImpl implements ShelfService {
         }
     }
 
-@Transactional
+    @Transactional
     @Override
     public ResponseEntity<Void> addShelfToShelfPosition(Long shelfId, Long shelfPositionId) {
         if (shelfId == null || shelfPositionId == null) {

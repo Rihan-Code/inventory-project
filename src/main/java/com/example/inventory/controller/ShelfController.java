@@ -1,9 +1,9 @@
 package com.example.inventory.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.inventory.model.ShelfSummaryDTO;
+import com.example.inventory.service.ShelfServiceImpl;
 import org.springframework.web.bind.annotation.*;
 import com.example.inventory.model.Shelf;
-import com.example.inventory.service.ShelfService;
 import com.example.inventory.model.ShelfPosition;
 import org.springframework.http.ResponseEntity;
 
@@ -13,20 +13,21 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/shelves")
 public class ShelfController {
-    @Autowired
-    private ShelfService shelfService;
+    final private ShelfServiceImpl shelfServiceImpl;
+    ShelfController(ShelfServiceImpl shelfServiceImpl) {
+        this.shelfServiceImpl = shelfServiceImpl;
+    }
 
     // saving shelf in db
     @PostMapping
-    public ResponseEntity<Shelf> saveShelf(@RequestBody Shelf shelf) {
-        Shelf savedShelf = shelfService.saveShelf(shelf);
-        return ResponseEntity.ok(savedShelf);
+    public ResponseEntity<Optional<Shelf>> saveShelf(@RequestBody Shelf shelf) {
+        return ResponseEntity.ok(shelfServiceImpl.saveShelf(shelf));
     }
 
     // getting shelf by id
     @GetMapping("/{id}")
     public ResponseEntity<Shelf> getShelf(@PathVariable Long id) {
-        return shelfService.getShelf(id)
+        return shelfServiceImpl.getShelf(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -34,7 +35,7 @@ public class ShelfController {
     // getting list of all the shelves
     @GetMapping
     public ResponseEntity<List<Shelf>> getAllShelves() {
-        return shelfService.getAllShelves()
+        return shelfServiceImpl.getAllShelves()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -42,21 +43,33 @@ public class ShelfController {
     // deleting a shelf using it's id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteShelf(@PathVariable Long id) {
-        shelfService.deleteShelf(id); // do not hard delete
+        shelfServiceImpl.deleteShelf(id);
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/{id}")
+    public ResponseEntity<Optional<Shelf>> updateShelf(@PathVariable Long id, @RequestBody Shelf updatedShelf) {
+        return ResponseEntity.ok(shelfServiceImpl.updateShelf(id, updatedShelf));
+    }
+
+    @GetMapping("/summary/{id}")
+    public ResponseEntity<Optional<ShelfSummaryDTO>> shelfSummary(@PathVariable Long id) {
+        return ResponseEntity.ok(shelfServiceImpl.getShelfSummaryById(id));
+    }
+
+
+    // **Shelf Positions Requests**
     // saving shelf positions
     @PostMapping("/positions")
-    public ResponseEntity<ShelfPosition> saveShelfPosition(@RequestBody ShelfPosition shelfPosition) {
-        ShelfPosition savedShelfPosition = shelfService.saveShelfPosition(shelfPosition);
+    public ResponseEntity<Optional<ShelfPosition>> saveShelfPosition(@RequestBody ShelfPosition shelfPosition) {
+        Optional<ShelfPosition> savedShelfPosition = shelfServiceImpl.saveShelfPosition(shelfPosition);
         return ResponseEntity.ok(savedShelfPosition);
     }
 
     // retrieving shelf position
     @GetMapping("/positions/{id}")
     public ResponseEntity<ShelfPosition> getShelfPosition(@PathVariable Long id) {
-        return shelfService.getShelfPosition(id)
+        return shelfServiceImpl.getShelfPosition(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -64,20 +77,30 @@ public class ShelfController {
     // getting all the shelf positions
     @GetMapping("/positions")
     public ResponseEntity<List<ShelfPosition>> getAllShelfPositions() {
-        return shelfService.getAllShelfPositions()
+        return shelfServiceImpl.getAllShelfPositions()
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+    @DeleteMapping("/positions/{id}")
+    public ResponseEntity<Void> deleteShelfPosition(@PathVariable Long id) {
+        shelfServiceImpl.deleteShelfPosition(id); // do not hard delete
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/positions/{id}")
+    public ResponseEntity<Optional<ShelfPosition>> updateShelfPosition(@PathVariable Long id, @RequestBody ShelfPosition updatedShelfPosition) {
+        return ResponseEntity.ok(shelfServiceImpl.updateShelfPosition(id, updatedShelfPosition));
     }
 
     // adding shlef position to device
     @PostMapping("/{deviceId}/add-shelf-position/{shelfPositionId}")
     public void addShelfPositionToDevice(@PathVariable Long deviceId, @PathVariable Long shelfPositionId) {
-        shelfService.addShelfPositionToDevice(deviceId, shelfPositionId);
+        shelfServiceImpl.addShelfPositionToDevice(deviceId, shelfPositionId);
     }
 
     // adding shelf to shelf position
     @PostMapping("/{shelfPositionId}/add-shelf/{shelfId}")
     public void addShelfToShelfPosition(@PathVariable Long shelfPositionId, @PathVariable Long shelfId) {
-        shelfService.addShelfToShelfPosition(shelfId, shelfPositionId);
+        shelfServiceImpl.addShelfToShelfPosition(shelfId, shelfPositionId);
     }
 }

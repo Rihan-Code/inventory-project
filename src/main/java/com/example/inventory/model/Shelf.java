@@ -27,7 +27,7 @@ public class Shelf {
 //        this.shelfPosition = shelfPosition;
 //    }
 
-    @JsonBackReference // Handle serialization for bidirectional reference
+//    @JsonBackReference // Handle serialization for bidirectional reference
     @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
     @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
     private ShelfPosition shelfPosition;

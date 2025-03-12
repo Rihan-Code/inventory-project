@@ -14,12 +14,11 @@ public class ShelfPosition {
     @GeneratedValue
     @EqualsAndHashCode.Include // Use only the ID for equality and hashing.
     private Long id;
-
     private String name;
     private String status = "Live";
 
 
-    @JsonBackReference // Handle serialization for bidirectional reference, prevents infinite recursion
+//    @JsonBackReference // Handle serialization for bidirectional reference, prevents infinite recursion
     @Relationship(type = "HAS", direction = Relationship.Direction.INCOMING)
     @ToString.Exclude // Exclude from Lombok's toString to avoid infinite recursion
     private Device device;

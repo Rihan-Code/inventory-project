@@ -34,9 +34,9 @@ public class ShelfControllerTest {
 
     @Test
     void testSaveShelf() {
-        when(shelfService.saveShelf(shelf)).thenReturn(shelf);
+        when(shelfService.saveShelf(shelf)).thenReturn(Optional.ofNullable(shelf));
 
-        ResponseEntity<Shelf> response = shelfController.saveShelf(shelf);
+        ResponseEntity<Optional<Shelf>> response = shelfController.saveShelf(shelf);
 
         assertNotNull(response);
         assertEquals(shelf, response.getBody());

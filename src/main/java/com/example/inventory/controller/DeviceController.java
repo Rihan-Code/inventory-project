@@ -38,8 +38,8 @@ public class DeviceController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Device> modifyDevice(@PathVariable long id, @RequestBody Device updatedDevice) {
-        return ResponseEntity.ok(deviceService.modifyDevice(id, updatedDevice));
+    public ResponseEntity<Optional<Device>> updateDevice(@PathVariable Long id, @RequestBody Device updatedDevice) {
+        return ResponseEntity.ok(deviceService.updateDevice(id, updatedDevice));
     }
 
     @DeleteMapping("/{id}")

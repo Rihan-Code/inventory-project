@@ -50,10 +50,10 @@ public class DeviceServiceTest {
     }
 
     @Test
-    void testModifyDevice() {
+    void testUpdateDevice() {
         when(deviceRepository.findById(1L)).thenReturn(Optional.of(device));
 
-        deviceService.modifyDevice(1L, device);
+        deviceService.updateDevice(1L, device);
         verify(deviceRepository, times(1)).save(device);
     }
 }
