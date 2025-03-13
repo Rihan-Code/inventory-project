@@ -68,7 +68,7 @@ public class ShelfServiceImpl implements ShelfService {
     }
 
     @Override
-    public Optional<ShelfSummaryDTO> getShelfSummaryById(Long id) {
+    public Optional<List<ShelfSummaryDTO>> getShelfSummaryById(Long id) {
         return shelfRepository.shelfSummary(id);
     }
 

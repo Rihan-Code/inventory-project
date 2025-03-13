@@ -53,7 +53,7 @@ public class ShelfController {
     }
 
     @GetMapping("/summary/{id}")
-    public ResponseEntity<Optional<ShelfSummaryDTO>> shelfSummary(@PathVariable Long id) {
+    public ResponseEntity<Optional<List<ShelfSummaryDTO>>> shelfSummary(@PathVariable Long id) {
         return ResponseEntity.ok(shelfServiceImpl.getShelfSummaryById(id));
     }
 
